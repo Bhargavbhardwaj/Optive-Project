@@ -11,21 +11,38 @@ def interpret_content(text,file_type):
 
     if "card" in text.lower() and "reader" in text.lower():
         return ("Access Card Reader",
-                "Digital access control using ID cards; "
-                "tracks entries with timestamps; dependent on card validity.")
+                "Tracks physical entry via ID cards with timestamps. Useful for monitoring movement, "
+                "but vulnerable to lost/stolen cards and tailgating risks.")
 
     if "fingerprint" in text.lower() or "biometric" in text.lower():
         return ("Biometric Attendance/Access System",
-                "Uses biometric authentication; prevents proxy access;"
-                " provides reliable and tamper-proof logs.")
+                "Captures entries using fingerprint/biometric scans. Prevents proxy access, "
+                "but needs secure template storage and spoof detection.")
 
     if "visitor" in text.lower() or "logbook" in text.lower():
         return ("Visitors Logbook",
-                "Manual entry system; prone to errors and falsification; lacks automated tracking.")
+                "Records guest entries manually or digitally. Prone to errors/falsification, "
+                "limited forensic use unless digitized with ID validation.")
 
     if "policy" in text.lower() or "firewall" in text.lower() or "ids" in text.lower():
         return ("Security Policy/Config File",
-                "Contains security rules (IAM/Firewall/IDS); requires validation for misconfigurations.")
+                "Defines access, firewall, or IDS rules. Misconfigurations can expose systems; "
+                "needs regular audits and least-privilege enforcement.")
+
+    if "kernel" in text.lower() or "syslog" in text.lower() or "boot" in text.lower():
+        return ("System Log File",
+                "Captures OS and kernel events. Useful for detecting crashes or tampering, "
+                "requires monitoring for repeated errors or anomalies.")
+
+    if "failed password" in text.lower() or "authentication failure" in text.lower():
+        return ("Authentication Log",
+                "Tracks login attempts. Multiple failures suggest brute force; "
+                "suspicious geolocations may indicate account compromise.")
+
+    if "incident" in text.lower() or "breach" in text.lower():
+        return ("Incident Report",
+                "Documents security events and response actions. Reveals attack vectors and impact; "
+                "should guide updates to security controls.")
 
     # Default - If none of the above rules matched then treat it as generic file.
     snippet = text[:100].replace("\n", " ") # return first 100 characters as a preview

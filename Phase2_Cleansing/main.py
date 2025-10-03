@@ -80,82 +80,159 @@ def route_file(input_path, output_path, file_type, action, use_spacy, audit):
         print(f"[FAIL] {input_path} → {file_type}: {e}")
         return False
 
+#
+# def main():
+#
+#     # entry point to run the script
+#     parser = argparse.ArgumentParser(description="Phase 2: File Cleansing and Analysis")
+#
+#     # must provide a file/folder containing files or a phase 1 CSV files with metadata
+#     parser.add_argument("--input", "-i", required=True,
+#                         help="Path to a file, folder, or CSV metadata file from Phase 1")
+#     # --output (or -o) - where to save cleansed files (default: cleansed_output/).
+#     parser.add_argument("--output", "-o", default="cleansed_output",
+#                         help="Output directory for cleansed files")
+#
+#     #--action - what to do with PII:
+#     parser.add_argument("--action", "-a", choices=["mask", "remove"], default="mask",
+#                         help="Whether to mask or remove PII")
+#
+#     # --use-spacy - flag to enable spaCy NER in addition to regex rules
+#     parser.add_argument("--use-spacy", action="store_true",
+#                         help="Enable spaCy NER in addition to regex detection")
+#
+#     args = parser.parse_args()  # Parses the arguments from the command line
+#
+#     # Prepare output directory and audit log
+#     ensure_dir(args.output) # Creates output directory if it doesn’t exist.
+#     audit = AuditLogger("audit_log.csv")  # initializes the log file
+#
+#     # Case 1: CSV metadata input (from Phase 1)
+#     if args.input.endswith(".csv"):
+#         with open(args.input, newline="", encoding="utf-8") as csvfile:
+#             reader = csv.DictReader(csvfile)
+#             for row in reader:
+#                 input_file = row.get("Full Path", row["Filename"])
+#                 file_type = normalize_type(row["File Type"], row["Filename"])  # e.g. application/pdf → pdf
+#                 output_file = os.path.join(args.output, os.path.basename(input_file))
+#
+#                 success = route_file(input_file, output_file, file_type, args.action,
+#                                      args.use_spacy, audit)
+#
+#                 if success:
+#                     print(f"[OK] Cleansed {input_file} → {output_file}")
+#                 else:
+#                     print(f"[FAIL] Could not cleanse {input_file}")
+#
+#     # Case 2: Folder input
+#     elif os.path.isdir(args.input):
+#         for root, _, files in os.walk(args.input):
+#             for file in files:
+#                 input_file = os.path.join(root, file)
+#                 ext = os.path.splitext(file)[-1].lower().strip(".")
+#                 output_file = os.path.join(args.output, file)
+#
+#                 success = route_file(input_file, output_file, ext, args.action,
+#                                      args.use_spacy, audit)
+#
+#                 if success:
+#                     print(f"[OK] Cleansed {input_file} → {output_file}")
+#                 else:
+#                     print(f"[FAIL] Could not cleanse {input_file}")
+#
+#     # Case 3: Single file input
+#     else:
+#         file = os.path.basename(args.input)
+#         ext = os.path.splitext(file)[-1].lower().strip(".")
+#         output_file = os.path.join(args.output, file)
+#
+#         success = route_file(args.input, output_file, ext, args.action,
+#                              args.use_spacy, audit)
+#
+#         if success:
+#             print(f"[OK] Cleansed {args.input} → {output_file}")
+#         else:
+#             print(f"[FAIL] Could not cleanse {args.input}")
+#
+#     audit.save()
+#     print("[DONE] Audit log written to audit_log.csv")
+#
+#
+# if __name__ == "__main__":
+#     main()
 
-def main():
+def run_phase2(input_path, output_dir="cleansed_output", action="mask", use_spacy=False):
+    """Run Phase 2 cleansing and return structured results."""
+    ensure_dir(output_dir)
+    #audit = AuditLogger(os.path.join(output_dir, "audit_log.csv"))
+    audit_log_path = os.path.join(output_dir, "audit_log.csv")
+    audit = AuditLogger(audit_log_path)
 
-    # entry point to run the script
-    parser = argparse.ArgumentParser(description="Phase 2: File Cleansing and Analysis")
+    cleansed_files = []
 
-    # must provide a file/folder containing files or a phase 1 CSV files with metadata
-    parser.add_argument("--input", "-i", required=True,
-                        help="Path to a file, folder, or CSV metadata file from Phase 1")
-    # --output (or -o) - where to save cleansed files (default: cleansed_output/).
-    parser.add_argument("--output", "-o", default="cleansed_output",
-                        help="Output directory for cleansed files")
-
-    #--action - what to do with PII:
-    parser.add_argument("--action", "-a", choices=["mask", "remove"], default="mask",
-                        help="Whether to mask or remove PII")
-
-    # --use-spacy - flag to enable spaCy NER in addition to regex rules
-    parser.add_argument("--use-spacy", action="store_true",
-                        help="Enable spaCy NER in addition to regex detection")
-
-    args = parser.parse_args()  # Parses the arguments from the command line
-
-    # Prepare output directory and audit log
-    ensure_dir(args.output) # Creates output directory if it doesn’t exist.
-    audit = AuditLogger("audit_log.csv")  # initializes the log file
-
-    # Case 1: CSV metadata input (from Phase 1)
-    if args.input.endswith(".csv"):
-        with open(args.input, newline="", encoding="utf-8") as csvfile:
+    # Case 1: CSV input (from Phase 1)
+    if input_path.endswith(".csv"):
+        with open(input_path, newline="", encoding="utf-8") as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
                 input_file = row.get("Full Path", row["Filename"])
-                file_type = normalize_type(row["File Type"], row["Filename"])  # e.g. application/pdf → pdf
-                output_file = os.path.join(args.output, os.path.basename(input_file))
+                file_type = normalize_type(row["File Type"], row["Filename"])
+                output_file = os.path.join(output_dir, os.path.basename(input_file))
 
-                success = route_file(input_file, output_file, file_type, args.action,
-                                     args.use_spacy, audit)
-
+                success = route_file(input_file, output_file, file_type, action, use_spacy, audit)
                 if success:
-                    print(f"[OK] Cleansed {input_file} → {output_file}")
-                else:
-                    print(f"[FAIL] Could not cleanse {input_file}")
+                    cleansed_files.append([os.path.basename(input_file), output_file, file_type])
 
     # Case 2: Folder input
-    elif os.path.isdir(args.input):
-        for root, _, files in os.walk(args.input):
+    elif os.path.isdir(input_path):
+        for root, _, files in os.walk(input_path):
             for file in files:
                 input_file = os.path.join(root, file)
                 ext = os.path.splitext(file)[-1].lower().strip(".")
-                output_file = os.path.join(args.output, file)
+                output_file = os.path.join(output_dir, file)
 
-                success = route_file(input_file, output_file, ext, args.action,
-                                     args.use_spacy, audit)
-
+                success = route_file(input_file, output_file, ext, action, use_spacy, audit)
                 if success:
-                    print(f"[OK] Cleansed {input_file} → {output_file}")
-                else:
-                    print(f"[FAIL] Could not cleanse {input_file}")
+                    cleansed_files.append([file, output_file, ext])
 
     # Case 3: Single file input
     else:
-        file = os.path.basename(args.input)
+        file = os.path.basename(input_path)
         ext = os.path.splitext(file)[-1].lower().strip(".")
-        output_file = os.path.join(args.output, file)
+        output_file = os.path.join(output_dir, file)
 
-        success = route_file(args.input, output_file, ext, args.action,
-                             args.use_spacy, audit)
-
+        success = route_file(input_path, output_file, ext, action, use_spacy, audit)
         if success:
-            print(f"[OK] Cleansed {args.input} → {output_file}")
-        else:
-            print(f"[FAIL] Could not cleanse {args.input}")
+            cleansed_files.append([file, output_file, ext])
+
+    # Save cleansed metadata CSV
+    cleansed_csv = os.path.join(output_dir, "cleansed_files.csv")
+    with open(cleansed_csv, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(["Filename", "Full Path", "File Type"])
+        writer.writerows(cleansed_files)
 
     audit.save()
-    print("[DONE] Audit log written to audit_log.csv")
+    #print(f"[DONE] Phase 2 complete. Audit log → {audit.logfile}")
+    print(f"[DONE] Phase 2 complete. Audit log → {audit_log_path}")
+
+    return {
+        "results": cleansed_files,
+        "csv_path": cleansed_csv,
+        "audit_log": audit_log_path,
+        "output_dir": output_dir
+    }
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Phase 2: File Cleansing and Analysis")
+    parser.add_argument("--input", "-i", required=True, help="Path to a file, folder, or Phase1 CSV")
+    parser.add_argument("--output", "-o", default="cleansed_output", help="Output directory")
+    parser.add_argument("--action", "-a", choices=["mask", "remove"], default="mask", help="PII handling mode")
+    parser.add_argument("--use-spacy", action="store_true", help="Enable spaCy NER in addition to regex")
+    args = parser.parse_args()
+
+    run_phase2(args.input, args.output, args.action, args.use_spacy)
 
 
 if __name__ == "__main__":

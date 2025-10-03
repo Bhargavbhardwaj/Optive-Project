@@ -1,17 +1,19 @@
 File Name,File Type,File Description,Key Findings
-Case Study.pdf,.pdf,Security Policy/Config File,Contains security rules (IAM/Firewall/IDS); requires validation for misconfigurations.
+audit_log.csv,.csv,Generic CSV File,"Extracted snippet: timestamp,input_file,output_file,detector,detection_type,original_snippet,action,notes 2025-10-02T19..."
+Case Study.pdf,.pdf,Security Policy/Config File,"Defines access, firewall, or IDS rules. Misconfigurations can expose systems; needs regular audits and least-privilege enforcement."
+cleansed_files.csv,.csv,Generic CSV File,"Extracted snippet: Filename,Full Path,File Type File_001.png,cleansed_output\File_001.png,png File_002.png,cleansed_out..."
 File_001.png,.png,Generic PNG File,Extracted snippet: a | > ¢ oO. Re :- S) al...
 File_002.png,.png,Could not extract content,No findings available
-File_003.png,.png,Visitors Logbook,Manual entry system; prone to errors and falsification; lacks automated tracking.
+File_003.png,.png,Visitors Logbook,"Records guest entries manually or digitally. Prone to errors/falsification, limited forensic use unless digitized with ID validation."
 File_004.png,.png,Generic PNG File,Extracted snippet: CERTIFICATE OF Data Destruction  This certifies that the following data and associated JM files have...
 File_005.png,.png,Generic PNG File,Extracted snippet: INTERNET = TRUSTED PRIVILEGED  Remote Employee}  Mobile Devices  a  Untrusted Client  Mainframe...
 File_006.jpg,.jpg,Generic JPG File,Extracted snippet: sian  eogecon one GD Mscemptrtecabon anew + tamtecomposatecem) Doosan pre) rset > meson Sone are  aa...
 File_007.png,.png,Generic PNG File,Extracted snippet: Server Room Confidential Archive  Office  Break Room Badge-only  Emergency =  gi |  = > Path of acce...
 File_008.xlsx,.xlsx,Generic XLSX File,Extracted snippet: Employee Full Name Employee ID Date of In-Person Verification Verified By ([REDACTED]) [REDACTED] Au...
-File_009.png,.png,Security Policy/Config File,Contains security rules (IAM/Firewall/IDS); requires validation for misconfigurations.
+File_009.png,.png,Security Policy/Config File,"Defines access, firewall, or IDS rules. Misconfigurations can expose systems; needs regular audits and least-privilege enforcement."
 File_010.png,.png,Generic PNG File,Extracted snippet: Rule name  default- allow- internal  default- allow-ssh  default- allow-rdp  default- allow-icmp  Di...
 File_011.png,.png,Generic PNG File,"Extracted snippet: o  Check for a Duo Push  Verify it's you by approving the notification...  Sent to ""Android"" (+++-++..."
 File_012.pdf,.pdf,Generic PDF File,Extracted snippet: User Registration and          De-registration Process  ...
-File_013.png,.png,Security Policy/Config File,Contains security rules (IAM/Firewall/IDS); requires validation for misconfigurations.
+File_013.png,.png,Security Policy/Config File,"Defines access, firewall, or IDS rules. Misconfigurations can expose systems; needs regular audits and least-privilege enforcement."
 File_014.pptx,.pptx,Generic PPTX File,Extracted snippet: [REDACTED] [REDACTED] Revision History...
-File_015.jpg,.jpg,Security Policy/Config File,Contains security rules (IAM/Firewall/IDS); requires validation for misconfigurations.
+File_015.jpg,.jpg,Security Policy/Config File,"Defines access, firewall, or IDS rules. Misconfigurations can expose systems; needs regular audits and least-privilege enforcement."

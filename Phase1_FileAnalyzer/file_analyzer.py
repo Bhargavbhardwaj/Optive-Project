@@ -50,31 +50,87 @@ def process_input(input_path, results = None):
     return results # returns a list of all file metadata
 
 
-if __name__ == "__main__":
-    input_path = "../Analysis Files.zip"  # give the file name of path here
+# if __name__ == "__main__":
+#     input_path = "../Analysis Files.zip"  # give the file name of path here
+#     files_metadata = process_input(input_path)
+#
+#     headers = ["Filename","Full Path", "File Type"]
+#     table = tabulate(files_metadata, headers=headers, tablefmt="grid")
+#     print(table)
+#
+# # save to text file
+#     with open("files_metadata.txt", "w", encoding="utf-8") as f:
+#         f.write(table)
+#
+# # save to CSV file
+#     with open("files_metadata.csv", "w", newline="", encoding="utf-8") as f:
+#         writer = csv.writer(f)
+#         writer.writerow(headers)
+#         writer.writerows(files_metadata)
+#
+# # total file count and types
+#     file_types = [row[2] for row in files_metadata]
+#     counts = Counter(file_types)
+#
+#     print("\nFile Type Summary: ")
+#     for ftype, count in counts.items():
+#         print(f"{ftype}: {count}")
+#
+#     print("\nMatadata saved to file_metadata.txt and file_metadata.csv")
+#
+
+
+def run_phase1(input_path, output_dir="phase1_output"):
+    """
+    Run Phase 1: Analyze files/ZIP and extract metadata.
+    Returns dict with results, csv_path, txt_path.
+    """
+    os.makedirs(output_dir, exist_ok=True)
+
     files_metadata = process_input(input_path)
 
-    headers = ["Filename","Full Path", "File Type"]
+    headers = ["Filename", "Full Path", "File Type"]
     table = tabulate(files_metadata, headers=headers, tablefmt="grid")
-    print(table)
 
-# save to text file
-    with open("files_metadata.txt", "w", encoding="utf-8") as f:
+    # Save TXT
+    txt_path = os.path.join(output_dir, "files_metadata.txt")
+    with open(txt_path, "w", encoding="utf-8") as f:
         f.write(table)
 
-# save to CSV file
-    with open("files_metadata.csv", "w", newline="", encoding="utf-8") as f:
+    # Save CSV
+    csv_path = os.path.join(output_dir, "files_metadata.csv")
+    with open(csv_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(headers)
         writer.writerows(files_metadata)
 
-# total file count and types
+    # File type summary
     file_types = [row[2] for row in files_metadata]
     counts = Counter(file_types)
 
-    print("\nFile Type Summary: ")
-    for ftype, count in counts.items():
-        print(f"{ftype}: {count}")
+    return {
+        # "results": files_metadata,
+        # "csv_path": csv_path,
+        # "txt_path": txt_path,
+        # "counts": counts,
+        "results": files_metadata,
+        "csv_path": os.path.join(output_dir, "files_metadata.csv"),
+        "txt_path": os.path.join(output_dir, "files_metadata.txt")
+    }
 
-    print("\nMatadata saved to file_metadata.txt and file_metadata.csv")
 
+# CLI compatibility
+if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Phase 1: File Analyzer")
+    #parser.add_argument("--input", "-i", required=True, help="Path to file or ZIP archive")
+    parser.add_argument("--input", "-i",default="Analysis Files.zip", help="Path to file or ZIP archive (default: 'Analysis Files.zip')")
+
+    parser.add_argument("--output", "-o", default="phase1_output", help="Output folder")
+    args = parser.parse_args()
+
+    result = run_phase1(args.input, args.output)
+    print(f"[DONE] Phase 1 → Metadata saved in {args.output}")
+    print("CSV:", result["csv_path"])
+    print("TXT:", result["txt_path"])

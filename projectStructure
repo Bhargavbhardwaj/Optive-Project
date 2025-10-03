@@ -1,0 +1,41 @@
+OptiveProject/
+│
+├── cleansed_output/                # Output of Phase 2 (Cleansed files)
+├── extracts_files/                 # Extracted files (from Phase 1)
+│
+├── Phase1_FileAnalyzer/            # Phase 1: File Type Analyzer
+│   ├── extracts_files/             # Extracted raw files
+│   ├── file_analyzer.py            # Detects & classifies file types
+│   ├── files_metadata.csv          # Metadata (Filename + Type + Path)
+│   └── files_metadata.txt          # Human-readable metadata
+│
+├── Phase2_Cleansing/               # Phase 2: File Cleansing
+│   ├── filehandlers/               # Format-specific handlers
+│   │   ├── doc_handler.py          # Cleansing Word files
+│   │   ├── excel_handler.py        # Cleansing Excel sheets
+│   │   ├── image_handler.py        # Masking/removing logos/PII in images
+│   │   ├── pdf_handler.py          # Cleansing PDF documents
+│   │   ├── pptx_handler.py         # Cleansing PPTX files
+│   │   └── text_handler.py         # Cleansing plain text / logs
+│   │
+│   ├── __init__.py                 # Package initializer
+│   ├── audit.py                    # Logs all cleansing actions
+│   ├── detectors.py                # Regex + spaCy for PII detection
+│   ├── maskers.py                  # Mask/remove detected PII
+│   ├── utils.py                    # Helper functions (dirs, paths)
+│   └── main.py                     # Entry point for Phase 2
+│
+├── Phase3_Analyzer/                # Phase 3: File Analysis & Reporting
+│   ├── extractors.py               # OCR/Text extraction from files
+│   ├── interpreters.py             # Security context interpretation
+│   ├── report_generator.py         # Generates CSV + TXT reports
+│   ├── main.py                     # Entry point for Phase 3
+│   └── phase3_output/              # Final results (reports)
+│       ├── phase3_report.csv
+│       └── phase3_report.txt
+│
+├── Analysis Files.zip              # Original input ZIP
+├── audit_log.csv                   # Phase 2 audit log
+├── audit_log.txt
+├── audit_log.xlsx
+└── Case Study.pdf                  # Provided problem statement
