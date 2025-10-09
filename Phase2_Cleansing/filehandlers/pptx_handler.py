@@ -5,8 +5,8 @@ from pptx.enum.shapes import MSO_SHAPE_TYPE
 from ..detectors import detect_pii_in_text
 from ..maskers import mask_text
 #from ..audit import write_audit_row
-from Phase2_Cleansing.audit import AuditLogger
-audit = AuditLogger("audit_log.csv")
+#from Phase2_Cleansing.audit import AuditLogger
+#audit = AuditLogger("audit_log.csv")
 
 def clean_pptx_file(input_path, output_path, action, use_spacy,audit, remove_immages = True):
     try:

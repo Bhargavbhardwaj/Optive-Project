@@ -1,6 +1,9 @@
 import streamlit as st
 import os
 import tempfile
+
+from pipeline_runner import run_pipeline
+
 from Phase1_FileAnalyzer.file_analyzer import run_phase1
 from Phase2_Cleansing.main import run_phase2
 from Phase3_Analyzer.main import run_phase3

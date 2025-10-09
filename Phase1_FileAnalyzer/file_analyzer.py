@@ -27,67 +27,78 @@ def process_file(file_path): # return only filename and file type
         return [os.path.basename(file_path), os.path.abspath(file_path),
                 detect_file_type(file_path)]  # gets just the filename from full path
     except Exception as e:
-        return [os.path.basename(file_path), f"Error: {str(e)}"]
+        return [os.path.basename(file_path), f"Error: {str(e)}", "Unknown"]
 
 # function to handle input
-def process_input(input_path, results = None):
-
+# def process_input(input_path,output_dir, results = None):
+#
+#     if results is None:
+#
+#         results = []
+#     if zipfile.is_zipfile(input_path):
+#         extract_dir =os.path.join(output_dir, "extracted_files")  #   if input is a ZIP file, then everything is extracted into a folder called "Extracted_files"
+#
+#         os.makedirs(extract_dir, exist_ok=True)
+#
+#
+#
+#         with zipfile.ZipFile(input_path, 'r') as z:
+#             z.extractall(extract_dir)
+#             for name in z.namelist():
+#                 file_path = os.path.join(extract_dir, name)
+#                 if os.path.isfile(file_path):
+#                     # Recursively handle nested zips or subfolders
+#                     process_input(file_path, output_dir, results)
+#
+#     elif os.path.isdir(input_path):
+#         for root, _, files in os.walk(input_path):
+#             for file in files:
+#                 process_input(os.path.join(root, file), output_dir, results)
+#
+#
+#
+#     else:
+#         results.append(process_file(input_path))
+#     return results # returns a list of all file metadata
+def process_input(input_path, output_dir, results=None):
+    """Recursively process files, directories, and ZIP archives."""
     if results is None:
-
         results = []
+
     if zipfile.is_zipfile(input_path):
+        extract_dir = os.path.join(output_dir, "extracted_files", os.path.splitext(os.path.basename(input_path))[0])
+        os.makedirs(extract_dir, exist_ok=True)
+
         with zipfile.ZipFile(input_path, 'r') as z:
-            extract_dir = "extracts_files"  # if input is a ZIP file, then everything is extracted into a folder called "Extracted_files"
-            os.makedirs(extract_dir, exist_ok=True)
             z.extractall(extract_dir)
-            for name in z.namelist(): # loops each file and processes it with process_file()
-                file_path = os.path.join(extract_dir, name)
-                if os.path.isfile(file_path):
-                    results.append(process_file(file_path))
 
-    else:
+        # After extraction, walk through everything extracted
+        for root, _, files in os.walk(extract_dir):
+            for file in files:
+                process_input(os.path.join(root, file), output_dir, results)
+
+    elif os.path.isdir(input_path):
+        for root, _, files in os.walk(input_path):
+            for file in files:
+                process_input(os.path.join(root, file), output_dir, results)
+
+    elif os.path.isfile(input_path):
         results.append(process_file(input_path))
-    return results # returns a list of all file metadata
+
+    return results
 
 
-# if __name__ == "__main__":
-#     input_path = "../Analysis Files.zip"  # give the file name of path here
-#     files_metadata = process_input(input_path)
-#
-#     headers = ["Filename","Full Path", "File Type"]
-#     table = tabulate(files_metadata, headers=headers, tablefmt="grid")
-#     print(table)
-#
-# # save to text file
-#     with open("files_metadata.txt", "w", encoding="utf-8") as f:
-#         f.write(table)
-#
-# # save to CSV file
-#     with open("files_metadata.csv", "w", newline="", encoding="utf-8") as f:
-#         writer = csv.writer(f)
-#         writer.writerow(headers)
-#         writer.writerows(files_metadata)
-#
-# # total file count and types
-#     file_types = [row[2] for row in files_metadata]
-#     counts = Counter(file_types)
-#
-#     print("\nFile Type Summary: ")
-#     for ftype, count in counts.items():
-#         print(f"{ftype}: {count}")
-#
-#     print("\nMatadata saved to file_metadata.txt and file_metadata.csv")
-#
+
 
 
 def run_phase1(input_path, output_dir="phase1_output"):
     """
     Run Phase 1: Analyze files/ZIP and extract metadata.
-    Returns dict with results, csv_path, txt_path.
+    Saves table to CSV and TXT, returns metadata info.
     """
     os.makedirs(output_dir, exist_ok=True)
 
-    files_metadata = process_input(input_path)
+    files_metadata = process_input(input_path, output_dir)
 
     headers = ["Filename", "Full Path", "File Type"]
     table = tabulate(files_metadata, headers=headers, tablefmt="grid")
@@ -104,33 +115,37 @@ def run_phase1(input_path, output_dir="phase1_output"):
         writer.writerow(headers)
         writer.writerows(files_metadata)
 
-    # File type summary
+    # Print summary
     file_types = [row[2] for row in files_metadata]
     counts = Counter(file_types)
 
+    print("\n📊 File Type Summary:")
+    for ftype, count in counts.items():
+        print(f"{ftype}: {count}")
+
+    print(f"\n✅ Metadata saved to:\n  {txt_path}\n  {csv_path}")
+
     return {
-        # "results": files_metadata,
-        # "csv_path": csv_path,
-        # "txt_path": txt_path,
-        # "counts": counts,
         "results": files_metadata,
-        "csv_path": os.path.join(output_dir, "files_metadata.csv"),
-        "txt_path": os.path.join(output_dir, "files_metadata.txt")
+        "csv_path": csv_path,
+        "txt_path": txt_path
     }
 
 
-# CLI compatibility
+
 if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Phase 1: File Analyzer")
-    #parser.add_argument("--input", "-i", required=True, help="Path to file or ZIP archive")
-    parser.add_argument("--input", "-i",default="Analysis Files.zip", help="Path to file or ZIP archive (default: 'Analysis Files.zip')")
-
-    parser.add_argument("--output", "-o", default="phase1_output", help="Output folder")
+    parser.add_argument("--input", "-i", required=True, help="Path to file or ZIP archive")
+    parser.add_argument("--output", "-o", default="phase1_output",
+                        help="Output folder for metadata and extracted files")
     args = parser.parse_args()
 
     result = run_phase1(args.input, args.output)
-    print(f"[DONE] Phase 1 → Metadata saved in {args.output}")
-    print("CSV:", result["csv_path"])
-    print("TXT:", result["txt_path"])
+
+    # Print table on terminal
+    headers = ["Filename", "Full Path", "File Type"]
+    print("\n" + tabulate(result["results"], headers=headers, tablefmt="grid"))
+
+    print(f"\n[DONE] Phase 1 complete → CSV: {result['csv_path']}")

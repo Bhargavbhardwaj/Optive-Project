@@ -5,7 +5,7 @@ and logs what was found (including sheet name and cell location).'''
 from ..detectors import detect_pii_in_text
 from ..maskers import mask_text
 from Phase2_Cleansing.audit import AuditLogger
-audit = AuditLogger("audit_log.csv")
+#audit = AuditLogger("audit_log.csv")
 #from ..audit import write_audit_row
 
 try:

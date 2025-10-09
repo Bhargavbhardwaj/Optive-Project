@@ -9,8 +9,8 @@ import docx
 
 from ..detectors import detect_pii_in_text
 from ..maskers import mask_text
-from ..audit  import AuditLogger
-audit = AuditLogger("audit_log.csv")
+#from ..audit  import AuditLogger
+# audit = AuditLogger("audit_log.csv")
 
 #from ..audit import write_audit_row
 

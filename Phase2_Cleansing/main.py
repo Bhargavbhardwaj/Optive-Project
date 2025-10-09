@@ -2,8 +2,10 @@ import os
 import argparse  # to handle command_line arguments
 import csv  # to read phase 1 metadata CSVs
 
-from .utils import ensure_dir  # makes sure an output directory exists
-from .audit import AuditLogger  # initialize audit_log.csv
+from .utils import ensure_dir
+from Phase2_Cleansing.audit import AuditLogger  # make sure this is the latest version with save()
+
+
 
 # cleansing functions for each file type
 from .filehandlers.text_handler import clean_text_file
@@ -13,23 +15,10 @@ from .filehandlers.pptx_handler import clean_pptx_file
 from .filehandlers.doc_handler import clean_doc_file
 from .filehandlers.image_handler import clean_image_file
 
-audit = AuditLogger("audit_log.csv")
 
 
-# def normalize_type(file_type, filename):
-#     """
-#     Normalize MIME types or extensions into simple extensions (pdf, png, etc.).
-#     """
-#     if "/" in file_type:  # MIME type
-#         if "pdf" in file_type: return "pdf"
-#         if "word" in file_type or "doc" in file_type: return "docx"
-#         if "presentation" in file_type or "ppt" in file_type: return "pptx"
-#         if "spreadsheet" in file_type or "excel" in file_type: return "xlsx"
-#         if "image" in file_type:
-#             return os.path.splitext(filename)[-1].lower().strip(".")
-#         return os.path.splitext(filename)[-1].lower().strip(".")
-#
-#     return file_type.lower().strip(".")
+
+
 def normalize_type(file_type, filename):
     ext = os.path.splitext(filename)[-1].lower().strip(".")  # get extension
 
@@ -52,9 +41,11 @@ def route_file(input_path, output_path, file_type, action, use_spacy, audit):
     # Routes file to appropriate handler based on type - similar to a dispatcher
     try:
 
-       file_type = file_type.lower()  # Normalize file extension like  PDF → pdf
+       file_type = file_type.lower()  # Normalize file extension like  PDF -> pdf
+       os.makedirs(os.path.dirname(output_path), exist_ok=True)  # ensure output folder exists
 
-# If extension matches ,  send file to the right handler.
+
+       # If extension matches ,  send file to the right handler.
        if file_type in ["txt", "csv", "log", "json"]:
            return clean_text_file(input_path, output_path, action, use_spacy, audit)
 
@@ -178,7 +169,7 @@ def run_phase2(input_path, output_dir="cleansed_output", action="mask", use_spac
                 input_file = row.get("Full Path", row["Filename"])
                 file_type = normalize_type(row["File Type"], row["Filename"])
                 output_file = os.path.join(output_dir, os.path.basename(input_file))
-
+               # os.makedirs(os.path.dirname(output_file), exist_ok=True)  #  ensure output folder exists
                 success = route_file(input_file, output_file, file_type, action, use_spacy, audit)
                 if success:
                     cleansed_files.append([os.path.basename(input_file), output_file, file_type])
@@ -191,6 +182,7 @@ def run_phase2(input_path, output_dir="cleansed_output", action="mask", use_spac
                 ext = os.path.splitext(file)[-1].lower().strip(".")
                 output_file = os.path.join(output_dir, file)
 
+                #os.makedirs(os.path.dirname(output_file), exist_ok=True)  #  ensure output folder exists
                 success = route_file(input_file, output_file, ext, action, use_spacy, audit)
                 if success:
                     cleansed_files.append([file, output_file, ext])
@@ -201,6 +193,7 @@ def run_phase2(input_path, output_dir="cleansed_output", action="mask", use_spac
         ext = os.path.splitext(file)[-1].lower().strip(".")
         output_file = os.path.join(output_dir, file)
 
+        #os.makedirs(os.path.dirname(output_file), exist_ok=True)  # ensure output folder exists
         success = route_file(input_path, output_file, ext, action, use_spacy, audit)
         if success:
             cleansed_files.append([file, output_file, ext])
@@ -213,7 +206,7 @@ def run_phase2(input_path, output_dir="cleansed_output", action="mask", use_spac
         writer.writerows(cleansed_files)
 
     audit.save()
-    #print(f"[DONE] Phase 2 complete. Audit log → {audit.logfile}")
+
     print(f"[DONE] Phase 2 complete. Audit log → {audit_log_path}")
 
     return {

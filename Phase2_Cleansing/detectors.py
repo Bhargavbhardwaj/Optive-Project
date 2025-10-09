@@ -13,13 +13,19 @@ except Exception:
 
 RE_PATTERNS = {  # match the findings from this pattern
     "Email": re.compile(r"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+"),
+    "FULL_NAME": re.compile(r"\b([A-Z][a-z]+[\s\-]){1,2}[A-Z][a-z]+\b"),
+    "NAME_WITH_TITLE": re.compile(r"\b(Mr\.|Mrs\.|Ms\.|Dr\.|Prof\.)\s([A-Z][a-z]+[\s\-]){1,2}[A-Z][a-z]+\b"),
+
     "Phone": re.compile(r"\b(\+?\d{1,3}[-.\s]?)?(\(?\d{2,4}\)?[-.\s]?)?\d{6,12}\b"),
     "IP": re.compile(r"\b(?:(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d?\d)\b"),
     "CREDIT_CARD": re.compile(r"\b(?:\d[ -]*?){13,16}\b"),
     "SSN_US": re.compile(r"\b\d{3}-\d{2}-\d{4}\b"),
     "URL": re.compile(r"https?://[^\s]+"),
     "AADHAR_CARD" : re.compile(r"\b\d{4}\s?\d{4}\s?\d{4}\b"),
-    "PAN_CARD": re.compile(r"\b[A-Z]{5}[0-9]{4}[A-Z]\b")
+    "PAN_CARD": re.compile(r"\b[A-Z]{5}[0-9]{4}[A-Z]\b"),
+    "INDIAN_DISTRICT": re.compile(r"\b(?:District|Dist|Zilla)\s+[A-Za-z\s]+\b", re.IGNORECASE),
+    "INDIAN_PINCODE": re.compile(r"\b\d{6}\b")
+
 
 }
 

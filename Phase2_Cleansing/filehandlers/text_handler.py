@@ -5,8 +5,8 @@
 from ..detectors import detect_pii_in_text
 from ..maskers import mask_text
 #from ..audit import write_audit_row
-from Phase2_Cleansing.audit import AuditLogger
-audit = AuditLogger("audit_log.csv")
+#from Phase2_Cleansing.audit import AuditLogger
+# audit = AuditLogger("audit_log.csv")
 
 
 
